@@ -62,7 +62,8 @@
                 "main": ".customer-photos-carousel img",
                 // "alt": ".detail-extend-tab img",
             },
-            "video": "video"
+            "video": "video",
+            "productDescription" : "[data-product-details-description-text-content]"
         }
     }
     
@@ -332,13 +333,14 @@
         
         let formCheckBoxData = [];
         // if (document.getElementById('selection-popup')) {
-            formCheckBoxData.push({'name': 'main-image', 'label' : "Main product's images"})
-            formCheckBoxData.push({'name': 'variation-images', 'label' : "Variations images"})
-            formCheckBoxData.push({'name': 'review-images', 'label' : "review images"})
+        formCheckBoxData.push({'name': 'main-image', 'label' : "Main product's images"})
+        formCheckBoxData.push({'name': 'variation-images', 'label' : "Variations images"})
+        formCheckBoxData.push({'name': 'review-images', 'label' : "review images"})
+        formCheckBoxData.push({'name': 'description-text', 'label' : "Product Description"})
 
-            if (document.querySelectorAll(sites[`${app.getSourceName()}`]['video']).length > 0 && app.getSourceName() != "amazon.com") {
-                formCheckBoxData.push({'name': 'product-videos', 'label' : "Main video"})
-            }
+        if (document.querySelectorAll(sites[`${app.getSourceName()}`]['video']).length > 0 && app.getSourceName() != "amazon.com") {
+            formCheckBoxData.push({'name': 'product-videos', 'label' : "Main video"})
+        }
 
 	    if (sites[`${app.getSourceName()}`]['variationImages'] != undefined) {
 	            if (document.querySelectorAll(sites[`${app.getSourceName()}`]['variationImages']['main']).length < 1 && document.querySelectorAll(sites[`${app.getSourceName()}`]['variationImages']['alt']).length < 1)
@@ -346,28 +348,11 @@
 	    } else {
         	        formCheckBoxData = formCheckBoxData.filter(obj => obj.name != 'variation-images');
 	    }
-
-        if (app.getSourceName() === "amazon.com") {
-            
-            document.querySelectorAll("h2").forEach(elem => {
-                if (elem.textContent === "Product review") {
-                    let parentElem = elem.parentElement;
-                    if (parentElem.querySelectorAll("img").length <= 0) {
-                        formCheckBoxData = formCheckBoxData.filter(obj => obj.name != 'review-images');
-                    }
-                }
-            })
-            if (document.querySelectorAll(sites[`${app.getSourceName()}`]['mainProdImage']['main']).length === 0 && document.querySelectorAll(sites[`${app.getSourceName()}`]['mainProdImage']['alt']).length === 0) {
-                formCheckBoxData = formCheckBoxData.filter(obj => obj.name != 'main-image');
-            }
+        if (document.querySelectorAll(sites[`${app.getSourceName()}`]['reviewImages']['main']).length < 1 && document.querySelectorAll(sites[`${app.getSourceName()}`]['reviewImages']['alt']).length < 1) {
+            formCheckBoxData = formCheckBoxData.filter(obj => obj.name != 'review-images');
         }
-        else {
-            if (document.querySelectorAll(sites[`${app.getSourceName()}`]['reviewImages']['main']).length < 1 && document.querySelectorAll(sites[`${app.getSourceName()}`]['reviewImages']['alt']).length < 1) {
-                formCheckBoxData = formCheckBoxData.filter(obj => obj.name != 'review-images');
-            }
-            if (document.querySelectorAll(sites[`${app.getSourceName()}`]['mainProdImage']).length === 0) {
-                formCheckBoxData = formCheckBoxData.filter(obj => obj.name != 'main-image');
-            }
+        if (document.querySelectorAll(sites[`${app.getSourceName()}`]['mainProdImage']).length === 0) {
+            formCheckBoxData = formCheckBoxData.filter(obj => obj.name != 'main-image');
         }
 
             
@@ -424,6 +409,9 @@
                 }
                 else {
                     if (app.getUserFeatures()['features'].includes("Description images") && input.value.includes("review")){
+                        input.disabled = false;
+                    }
+                    else if (input.value == "Product Description") {
                         input.disabled = false;
                     }
                     else {
@@ -508,6 +496,10 @@
                 if (selectedFeatures.includes("Main video")) {
                     downloadProductVideos();
                 }
+                
+                if (selectedFeatures.includes("Product Description")) {
+                    downloadProductDescription();
+                }
             }
         }
 
@@ -567,43 +559,26 @@
         let interval = setInterval(setPercent, 250);
     }
 
-    function toJpeg (img){
-        return new Promise(function (resolve) {
-            var xhr = new XMLHttpRequest();
-                xhr.open("get", img, true);
-                xhr.responseType = "blob";
-                xhr.onload = function () {
-                    if (this.status == 200) {
-                        var blob = this.response;
-                        var oFileReader = new FileReader();
-                        oFileReader.onloadend = function (e) {
-                            // Create a new Image Obj
-                            var newImg = new Image();
-                            // Set crossOrigin Anonymous 
-                            newImg.crossOrigin = "Anonymous";
-                            newImg.onload = function() {
-                                // Create a new Canvas
-                                var canvas = document.createElement("canvas");
-                                // Set 2D context
-                                var context = canvas.getContext("2d");
-                                // Set crossOrigin Anonymous 
-                                canvas.crossOrigin = "anonymous";
-                                // Set Width/Height
-                                canvas.width = newImg.width;
-                                canvas.height = newImg.height;
-                                // Start
-                                context.drawImage(newImg, 0, 0);
-                                // Get jpeg Base64
-                                resolve(canvas.toDataURL('image/jpeg'));
-                            };
-                            // Load Webp Base64
-                            newImg.src = e.target.result;
-                        };
-                        oFileReader.readAsDataURL(blob);
-                    }
-                };
-                xhr.send();
-        })
+    function downloadProductDescription () {
+        let domElem = sites[`${app.getSourceName()}`]['productDescription'];
+        let title = sites[`${app.getSourceName()}`]['productTitle'];
+
+        let docText = `${document.querySelector(title).textContent} \n\n ${document.querySelector(domElem).textContent}`.trim().replace(/<br>/g, "\n\n")
+        
+        
+        const blob = new Blob([docText], { type: "text/plain" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+
+        a.href = url;
+        a.download = `${document.querySelector(title).textContent}.txt`;
+        document.body.appendChild(a);
+
+        a.click();
+
+        // Clean up
+        URL.revokeObjectURL(url);
+        document.body.removeChild(a);
     }
 
     const downloadProductMain = () => {
