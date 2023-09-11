@@ -62,7 +62,7 @@
                 "main": ".customer-photos-carousel img",
                 // "alt": ".detail-extend-tab img",
             },
-            "video": "video",
+            "video": "video source",
             "productDescription" : "[data-product-details-description-text-content]"
         }
     }
@@ -568,17 +568,8 @@
         
         const blob = new Blob([docText], { type: "text/plain" });
         const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-
-        a.href = url;
-        a.download = `${document.querySelector(title).textContent}.txt`;
-        document.body.appendChild(a);
-
-        a.click();
-
-        // Clean up
-        URL.revokeObjectURL(url);
-        document.body.removeChild(a);
+        
+        performDownload(url, 'product-description', 'txt')
     }
 
     const downloadProductMain = () => {
