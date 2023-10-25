@@ -9,7 +9,7 @@ let userFeatures = null;
 
 const checkAuth = async (access_token, refresh_token) => {
     // attempt login using access key
-    let response = await makeRequest("api/subscriptions/aliexpress/", "GET", {"access": access_token});
+    let response = await makeRequest("api/subscriptions/etsy/", "GET", {"access": access_token});
     if (response) {
         // if successful, render download features     
         return response;
@@ -146,6 +146,7 @@ const reloadInterface = () => {
             if (response) {
                 // if successfull the user is logged in automatically and the data view is renders
                 response.then(data => {
+                    console.log("response: ", data)
                     app.setAuthStatus(true);
                     app.setUserFeatures(data); // store fetched data
                     userFeatures = data;
@@ -170,13 +171,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // user on allowed site (site with download pop up)
     const activeTab = await getCurrentTab();
-    if ((activeTab.url && activeTab.url.includes("aliexpress.com/item")) || (activeTab.url && activeTab.url.includes("amazon.com/")) || activeTab.url && activeTab.url.includes("ebay.com/itm")) {
+    if ((activeTab.url && activeTab.url.includes("etsy.com/listing"))) {
         app.setActiveTabId(activeTab.id);
         app.setIsAllowedSite(true);
     }
     else {
         app.setIsAllowedSite(false);
     }
-
     reloadInterface();
 });

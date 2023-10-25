@@ -1,14 +1,14 @@
-// chrome.runtime.onInstalled.addListener(function() {
-//   chrome.tabs.create({
-//     url: 'https://app.ilazy.net/',
-//     active: true
-//   });
+chrome.runtime.onInstalled.addListener(function() {
+  chrome.tabs.create({
+    url: 'https://app.ilazy.net/',
+    active: true
+  });
 
-//   chrome.storage.sync.set({ "isNewUser": true }, function(){});
-//   return false;
-// });
+  chrome.storage.sync.set({ "isNewUser": true }, function(){});
+  return false;
+});
 
-// chrome.runtime.setUninstallURL('https://ilazy.net/uninstallext/');
+chrome.runtime.setUninstallURL('https://ilazy.net/uninstallext/');
 
 
 var backend_url = 'https://app.ilazy.net/';

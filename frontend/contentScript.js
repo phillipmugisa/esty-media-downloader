@@ -141,7 +141,7 @@
         }
 
         // attempt login using access key
-        let response = await makeRequest("api/subscriptions/aliexpress/", "GET", {"access": access_token});
+        let response = await makeRequest("api/subscriptions/etsy/", "GET", {"access": access_token});
         if (response) {
             // if successful, render download features            
             app.setAuthStatus(true);
@@ -418,7 +418,7 @@
                         const formGroup = input.parentNode;
                         const link = document.createElement('a');
                         link.target = `_blank`;
-                        link.href = `${backend_url}package/aliexpress-media-downloader`;
+                        link.href = `${backend_url}package/`;
                         link.textContent = '(Go Pro)'
                         link.className = 'pro-link';
                         link.style.color = '#FF4747';
@@ -563,7 +563,7 @@
         let domElem = sites[`${app.getSourceName()}`]['productDescription'];
         let title = sites[`${app.getSourceName()}`]['productTitle'];
 
-        let docText = `${document.querySelector(title).textContent} \n\n ${document.querySelector(domElem).textContent}`.trim().replace(/<br>/g, "\n\n")
+        let docText = `Title: ${document.querySelector(title).textContent} \n\n Description: ${document.querySelector(domElem).textContent}`.trim().replace(/<br>/g, "\n\n")
         
         
         const blob = new Blob([docText], { type: "text/plain" });
